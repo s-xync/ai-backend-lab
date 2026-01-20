@@ -1,5 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from uuid import uuid4
+from app.core.auth import get_current_user
+from app.core.tenant import get_tenant_id
 from app.models.document import DocumentCreate, DocumentResponse
 
 router = APIRouter(tags=["Documents"])
@@ -7,7 +9,7 @@ router = APIRouter(tags=["Documents"])
 DB = {}
 
 @router.post("/documents", response_model=DocumentResponse)
-def create_document(payload: DocumentCreate):
+def create_document(payload: DocumentCreate, user=Depends(get_current_user), tenant_id=Depends(get_tenant_id)):
     doc_id = uuid4()
     document = {
         "id": doc_id,
